@@ -37,4 +37,8 @@ public class UserService {
 
         return user;
     }
+
+    public User findUser(String userEmail) {
+        return users.get(userEmail);
+    }
 }
