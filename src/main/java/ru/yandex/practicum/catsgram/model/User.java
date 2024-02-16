@@ -6,7 +6,7 @@ import java.util.Objects;
 public class User {
     private String email;
     private String nickname;
-    private LocalDate birthdate;
+    private String birthdate;
 
     public String getEmail() {
         return email;
@@ -24,11 +24,11 @@ public class User {
         this.nickname = nickname;
     }
 
-    public LocalDate getBirthdate() {
+    public String getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(LocalDate birthdate) {
+    public void setBirthdate(String birthdate) {
         this.birthdate = birthdate;
     }
 

@@ -39,6 +39,8 @@ public class UserService {
     }
 
     public User findUser(String userEmail) {
+        if (userEmail == null)
+            return null;
         return users.get(userEmail);
     }
 }
