@@ -34,4 +34,9 @@ public class UserController {
     public User put(@RequestBody User user) {
         return userService.put(user);
     }
+
+    @GetMapping ("/{userEmail}")
+    public User findUser(@PathVariable String userEmail) {
+        return userService.findUser(userEmail);
+    }
 }
