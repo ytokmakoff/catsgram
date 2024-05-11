@@ -1,18 +1,14 @@
 package ru.yandex.practicum.catsgram.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
-import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
-import ru.yandex.practicum.catsgram.exception.NotFoundException;
+import ru.yandex.practicum.catsgram.exception.*;
 import ru.yandex.practicum.catsgram.model.User;
 
-import java.time.Instant;
 import java.util.*;
 
 @Service
 public class UserService {
-    private final Map<Long, User> users = new HashMap<>();
-    private final Set<String> userEmails = new HashSet<>();
+    private final Map<String, User> users = new HashMap<>();
 
     public Collection<User> getAll() {
         return users.values();
@@ -20,60 +16,30 @@ public class UserService {
 
     public User createUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new ConditionsNotMetException("Имейл должен быть указан");
+            throw new InvalidEmailException("Адрес электронной почты не может быть пустым");
         }
 
-        if (userEmails.contains(user.getEmail())) {
-            throw new DuplicatedDataException("Этот имейл уже используется");
+        if (users.containsKey(user.getEmail())) {
+            throw new UserAlreadyExistException("Пользователь с электронной почтой " +
+                    user.getEmail() + " уже зарегистрирован");
         }
 
-        user.setId(getNextId());
-        user.setRegistrationDate(Instant.now());
+        users.put(user.getEmail(), user);
+        return user;
+    }
 
-        userEmails.add(user.getEmail());
-        users.put(user.getId(), user);
+    public User updateUser(User user) {
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new InvalidEmailException("Адрес электронной почты не может быть пустым");
+        }
+        users.put(user.getEmail(), user);
 
         return user;
     }
 
-    public User updateUser(User newUser) {
-        if (newUser.getEmail() == null || newUser.getEmail().isBlank()) {
-            throw new ConditionsNotMetException("Имейл должен быть указан");
-        }
-        if (newUser.getId() == null) {
-            throw new ConditionsNotMetException("Id должен быть указан");
-        }
-
-        if (users.containsKey(newUser.getId())) {
-            User oldUser = users.get(newUser.getId());
-            if (!oldUser.getEmail().equals(newUser.getEmail()) && userEmails.contains(newUser.getEmail())) {
-                throw new DuplicatedDataException("Этот имейл уже используется");
-            }
-
-            oldUser.setEmail(newUser.getEmail());
-            if (!(newUser.getUsername() == null || newUser.getUsername().isBlank())) {
-                oldUser.setUsername(newUser.getUsername());
-            }
-            if (!(newUser.getPassword() == null || newUser.getPassword().isBlank())) {
-                oldUser.setPassword(newUser.getPassword());
-            }
-
-            return oldUser;
-        }
-
-        throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
-    }
-
-    public Optional<User> findUserById(long id) {
-        return Optional.ofNullable(users.get(id));
-    }
-
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    public User findUserByEmail(String email) {
+        if (email == null)
+            return null;
+        return users.get(email);
     }
 }
