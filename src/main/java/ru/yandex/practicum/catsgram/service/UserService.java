@@ -64,6 +64,10 @@ public class UserService {
         throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
     }
 
+    public Optional<User> findUserById(long id) {
+        return Optional.ofNullable(users.get(id));
+    }
+
     private long getNextId() {
         long currentMaxId = users.keySet()
                 .stream()
