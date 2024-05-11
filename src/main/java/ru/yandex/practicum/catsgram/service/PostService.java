@@ -50,6 +50,13 @@ public class PostService {
         throw new NotFoundException("Пост с id = " + newPost.getId() + " не найден");
     }
 
+    public Post findPostById(long id) {
+        if (!posts.containsKey(id)) {
+            throw new NotFoundException("Пост с id = " + id + " не найден");
+        }
+        return posts.get(id);
+    }
+
     private long getNextId() {
         long currentMaxId = posts.keySet()
                 .stream()
