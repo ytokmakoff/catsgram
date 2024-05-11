@@ -17,8 +17,10 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public List<Post> findAll() {
-        return postService.findAll();
+    public List<Post> findAll(@RequestParam(defaultValue = "0") int from,
+                              @RequestParam(defaultValue = "10") int size,
+                              @RequestParam(defaultValue = "desc") String sort) {
+        return postService.findAll(from, size, sort);
     }
 
     @PostMapping(value = "/post")
