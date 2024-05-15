@@ -1,5 +1,8 @@
 package ru.yandex.practicum.catsgram.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ParameterNotValidException extends IllegalArgumentException {
     private final String parameter;
     private final String reason;
@@ -9,11 +12,4 @@ public class ParameterNotValidException extends IllegalArgumentException {
         this.reason = reason;
     }
 
-    public String getParameter() {
-        return parameter;
-    }
-
-    public String getReason() {
-        return reason;
-    }
 }
