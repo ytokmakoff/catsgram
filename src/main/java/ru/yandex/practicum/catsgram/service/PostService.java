@@ -2,7 +2,7 @@ package ru.yandex.practicum.catsgram.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.catsgram.exception.PostNotFoundException;
+import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.exception.UserNotFoundException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.User;
@@ -12,17 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-enum SortOrder {
-    ASCENDING, DESCENDING;
-
-    public static SortOrder from(String order) {
-        return switch (order.toLowerCase()) {
-            case "ascending", "asc" -> ASCENDING;
-            case "descending", "desc" -> DESCENDING;
-            default -> null;
-        };
-    }
-}
 
 @Service
 public class PostService {
@@ -68,6 +57,6 @@ public class PostService {
         return posts.stream()
                 .filter(p -> p.getId().equals(postId))
                 .findFirst()
-                .orElseThrow(() -> new PostNotFoundException(String.format("Пост № %d не найден", postId)));
+                .orElseThrow(() -> new NotFoundException(String.format("Пост № %d не найден", postId)));
     }
 }
