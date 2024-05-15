@@ -12,6 +12,18 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+enum SortOrder {
+    ASCENDING, DESCENDING;
+
+    public static SortOrder from(String order) {
+        return switch (order.toLowerCase()) {
+            case "ascending", "asc" -> ASCENDING;
+            case "descending", "desc" -> DESCENDING;
+            default -> null;
+        };
+    }
+}
+
 @Service
 public class PostService {
     private static Integer globalId = 0;
@@ -28,7 +40,6 @@ public class PostService {
     }
 
     public List<Post> findAll(int from, int size, String sort) {
-
         SortOrder order = SortOrder.from(sort);
 
         return posts.stream()
@@ -58,16 +69,5 @@ public class PostService {
                 .filter(p -> p.getId().equals(postId))
                 .findFirst()
                 .orElseThrow(() -> new PostNotFoundException(String.format("Пост № %d не найден", postId)));
-    }
-}
-
-enum SortOrder {
-    ASCENDING, DESCENDING;
-    public static SortOrder from (String order) {
-        return switch (order.toLowerCase()) {
-            case "ascending", "asc" -> ASCENDING;
-            case "descending", "desc" -> DESCENDING;
-            default -> null;
-        };
     }
 }
