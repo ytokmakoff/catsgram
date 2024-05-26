@@ -1,20 +1,21 @@
 services:
   db:
     image: postgres:16.1
-    container_name: catsgram
+    container_name: postgres
     ports:
       - "5432:5432"
     volumes:
       - ./volumes/postgres:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=catsgram
-      - POSTGRES_USER=ytokmakoff
+      - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=12345
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s
       interval: 5s
       retries: 10
+
   db-init:
     image: postgres:16.1
     container_name: db-init
