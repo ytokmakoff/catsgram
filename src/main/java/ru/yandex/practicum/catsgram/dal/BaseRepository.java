@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import ru.yandex.practicum.catsgram.exception.InternalServerException;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,5 +30,12 @@ public class BaseRepository<T> {
     protected boolean delete(String query, long id) {
         int rowsDeleted = jdbc.update(query, id);
         return rowsDeleted > 0;
+    }
+
+    protected void update(String query, Object... params) {
+        int rowUpdated = jdbc.update(query, params);
+        if (rowUpdated == 0) {
+            throw new InternalServerException("Не удалось обновить данные");
+        }
     }
 }
