@@ -25,4 +25,9 @@ public class BaseRepository<T> {
     protected List<T> findMany(String query, Object... params) {
         return jdbc.query(query, mapper, params);
     }
+
+    protected boolean delete(String query, long id) {
+        int rowsDeleted = jdbc.update(query, id);
+        return rowsDeleted > 0;
+    }
 }
