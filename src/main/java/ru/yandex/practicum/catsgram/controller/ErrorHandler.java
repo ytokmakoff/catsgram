@@ -4,9 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.yandex.practicum.catsgram.exception.InternalServerException;
-import ru.yandex.practicum.catsgram.exception.NotFoundException;
-import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
+import ru.yandex.practicum.catsgram.exception.*;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -19,6 +17,18 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleParameterNotValidException(ParameterNotValidException e) {
+        return new ErrorResponse("Parameter not valid", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleConditionsNotMetException(ConditionsNotMetException e) {
+        return new ErrorResponse("Parameter not valid", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDuplicatedDataException(DuplicatedDataException e) {
         return new ErrorResponse("Parameter not valid", e.getMessage());
     }
 
