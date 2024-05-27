@@ -49,4 +49,14 @@ public class UserRepository extends BaseRepository<User> {
         user.setId(id);
         return user;
     }
+
+    public User update(User user) {
+        update(
+                UPDATE_QUERY,
+                user.getUsername(),
+                user.getEmail(),
+                user.getPassword()
+        );
+        return user;
+    }
 }
