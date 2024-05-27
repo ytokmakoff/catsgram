@@ -15,48 +15,48 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostService {
-    private static Integer globalId = 0;
-    private final UserService userService;
-    private final List<Post> posts = new ArrayList<>();
-
-    @Autowired
-    public PostService(UserService userService) {
-        this.userService = userService;
-    }
-
-    private static Integer getNextId() {
-        return globalId++;
-    }
-
-    public List<Post> findAll(int from, int size, String sort) {
-        SortOrder order = SortOrder.from(sort);
-
-        return posts.stream()
-                .skip(from)
-                .limit(size)
-                .sorted(order.equals(SortOrder.ASCENDING) ?
-                        Comparator.comparing(Post::getCreationDate) :
-                        Comparator.comparing(Post::getCreationDate).reversed())
-                .collect(Collectors.toList());
-    }
-
-    public Post create(Post post) {
-        User postAuthor = userService.findUserByEmail(post.getAuthor());
-        if (postAuthor == null) {
-            throw new UserNotFoundException(String.format(
-                    "Пользователь %s не найден",
-                    post.getAuthor()));
-        }
-
-        post.setId(getNextId());
-        posts.add(post);
-        return post;
-    }
-
-    public Post findPostById(Integer postId) {
-        return posts.stream()
-                .filter(p -> p.getId().equals(postId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(String.format("Пост № %d не найден", postId)));
-    }
+//    private static Integer globalId = 0;
+//    private final UserService userService;
+//    private final List<Post> posts = new ArrayList<>();
+//
+//    @Autowired
+//    public PostService(UserService userService) {
+//        this.userService = userService;
+//    }
+//
+//    private static Integer getNextId() {
+//        return globalId++;
+//    }
+//
+//    public List<Post> findAll(int from, int size, String sort) {
+//        SortOrder order = SortOrder.from(sort);
+//
+//        return posts.stream()
+//                .skip(from)
+//                .limit(size)
+//                .sorted(order.equals(SortOrder.ASCENDING) ?
+//                        Comparator.comparing(Post::getCreationDate) :
+//                        Comparator.comparing(Post::getCreationDate).reversed())
+//                .collect(Collectors.toList());
+//    }
+//
+//    public Post create(Post post) {
+////        User postAuthor = userService.findUserByEmail(post.getAuthor());
+////        if (postAuthor == null) {
+////            throw new UserNotFoundException(String.format(
+////                    "Пользователь %s не найден",
+////                    post.getAuthor()));
+////        }
+////
+////        post.setId(getNextId());
+////        posts.add(post);
+////        return post;
+////    }
+////
+//    public Post findPostById(Integer postId) {
+//        return posts.stream()
+//                .filter(p -> p.getId().equals(postId))
+//                .findFirst()
+//                .orElseThrow(() -> new NotFoundException(String.format("Пост № %d не найден", postId)));
+//    }
 }
