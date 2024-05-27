@@ -1,62 +1,69 @@
 package ru.yandex.practicum.catsgram.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.catsgram.dal.ImageRepository;
+import ru.yandex.practicum.catsgram.dal.PostRepository;
+import ru.yandex.practicum.catsgram.dal.UserRepository;
+import ru.yandex.practicum.catsgram.dto.NewPostRequest;
+import ru.yandex.practicum.catsgram.dto.PostDto;
+import ru.yandex.practicum.catsgram.dto.UpdatePostRequest;
+import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
-import ru.yandex.practicum.catsgram.exception.UserNotFoundException;
+import ru.yandex.practicum.catsgram.mapper.PostMapper;
+import ru.yandex.practicum.catsgram.model.Image;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.model.User;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
-
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
-//    private static Integer globalId = 0;
-//    private final UserService userService;
-//    private final List<Post> posts = new ArrayList<>();
-//
-//    @Autowired
-//    public PostService(UserService userService) {
-//        this.userService = userService;
-//    }
-//
-//    private static Integer getNextId() {
-//        return globalId++;
-//    }
-//
-//    public List<Post> findAll(int from, int size, String sort) {
-//        SortOrder order = SortOrder.from(sort);
-//
-//        return posts.stream()
-//                .skip(from)
-//                .limit(size)
-//                .sorted(order.equals(SortOrder.ASCENDING) ?
-//                        Comparator.comparing(Post::getCreationDate) :
-//                        Comparator.comparing(Post::getCreationDate).reversed())
-//                .collect(Collectors.toList());
-//    }
-//
-//    public Post create(Post post) {
-////        User postAuthor = userService.findUserByEmail(post.getAuthor());
-////        if (postAuthor == null) {
-////            throw new UserNotFoundException(String.format(
-////                    "Пользователь %s не найден",
-////                    post.getAuthor()));
-////        }
-////
-////        post.setId(getNextId());
-////        posts.add(post);
-////        return post;
-////    }
-////
-//    public Post findPostById(Integer postId) {
-//        return posts.stream()
-//                .filter(p -> p.getId().equals(postId))
-//                .findFirst()
-//                .orElseThrow(() -> new NotFoundException(String.format("Пост № %d не найден", postId)));
-//    }
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final ImageRepository imageRepository;
+
+    public PostDto createPost(NewPostRequest newPostRequest) {
+        User author = userRepository.findById(newPostRequest.getAuthorId())
+                .orElseThrow(() -> new ConditionsNotMetException("Указанный автор не найден"));
+
+        Post post = PostMapper.mapToPost(newPostRequest, author);
+
+        postRepository.save(post);
+
+        return PostMapper.mapToPostDto(post);
+    }
+
+    public PostDto getPostById(long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Пост с идентификатором " + postId + " не найден."));
+
+        User author = userRepository.findById(post.getAuthor().getId())
+                .orElseThrow(() -> new RuntimeException("Автор поста не найден"));
+
+        List<Image> images = imageRepository.findByPostId(postId);
+
+        post.setAuthor(author);
+        post.setImages(images);
+
+        return PostMapper.mapToPostDto(post);
+    }
+
+    public PostDto updatePost(long postId, UpdatePostRequest request) {
+        if (request.getDescription() == null || request.getDescription().isBlank()) {
+            throw new ConditionsNotMetException("Текст публикации не может быть пустым");
+        }
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Пост с идентификатором " + postId + " не найден."));
+
+        post.setDescription(request.getDescription());
+        post.setPostDate(Instant.now());
+
+        postRepository.update(post);
+
+        return PostMapper.mapToPostDto(post);
+    }
 }

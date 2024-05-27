@@ -6,6 +6,7 @@ import ru.yandex.practicum.catsgram.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 @Component
 public class UserRowMapper implements RowMapper<User> {
@@ -16,7 +17,9 @@ public class UserRowMapper implements RowMapper<User> {
         user.setUsername(resultSet.getString("username"));
         user.setEmail(resultSet.getString("email"));
         user.setPassword(resultSet.getString("password"));
-        user.setRegistrationDate(resultSet.getTimestamp("registration_date").toInstant());
+
+        Timestamp registrationDate = resultSet.getTimestamp("registration_date");
+        user.setRegistrationDate(registrationDate.toInstant());
 
         return user;
     }
