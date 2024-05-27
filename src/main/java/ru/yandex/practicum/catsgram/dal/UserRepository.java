@@ -3,6 +3,7 @@ package ru.yandex.practicum.catsgram.dal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.catsgram.dal.mappers.UserRowMapper;
 import ru.yandex.practicum.catsgram.model.User;
@@ -11,33 +12,24 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
-public class UserRepository {
-    private final JdbcTemplate jdbc;
-    private final UserRowMapper mapper;
+public class UserRepository extends BaseRepository<User> {
+    private static final String FIND_ALL_QUERY = "SELECT * FROM users";
+    private static final String FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
 
-    public List<User> findAll() {
-        String query = "SELECT * FROM users";
-        return jdbc.query(query, mapper);
+    public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
+        super(jdbc, mapper);
     }
 
-    public Optional<User> findUserByEmail(String email) {
-        String query = "SELECT * FROM users WHERE email = ?";
-        try {
-            User result = jdbc.queryForObject(query, mapper, email);
-            return Optional.ofNullable(result);
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
+    public List<User> findAll() {
+        return findMany(FIND_ALL_QUERY);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return findOne(FIND_BY_EMAIL_QUERY, email);
     }
 
     public Optional<User> findById(long userId) {
-        String query = "SELECT * FROM users WHERE id = ?";
-        try {
-            User result = jdbc.queryForObject(query, mapper, userId);
-            return Optional.ofNullable(result);
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
+        return findOne(FIND_BY_ID_QUERY, userId);
     }
 }
